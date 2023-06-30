@@ -346,6 +346,7 @@ initiate () {
 	# Pull images
 	printf "### Initiating OS2Display ###\nPulling images...\n"
 	sudo docker compose pull
+	sleep 2
 	# Create necessary folders
 	printf "Creating necessary directories if they're missing.\n"
 	mkdir -p jwt media
