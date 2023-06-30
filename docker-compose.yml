@@ -1,0 +1,142 @@
+networks:
+  frontend:
+    external: true
+  app:
+    driver: bridge
+    internal: false
+
+services:
+  client:
+    image: os2display/os2display-client:latest
+    networks:
+      - app
+      - frontend
+    environment:
+      - APP_SCREEN_CLIENT_PATH=${COMPOSE_SCREEN_CLIENT_PATH:?err}
+      - APP_API_PATH=${APP_API_PATH:?err}
+      - APP_API_AUTHENTICATION_ENDPOINT=${APP_API_AUTHENTICATION_ENDPOINT}
+      - APP_API_AUTHENTICATION_REFRESH_ENDPOINT=${APP_API_AUTHENTICATION_REFRESH_ENDPOINT}
+      - APP_DATA_PULL_INTERVAL=${APP_DATA_PULL_INTERVAL}
+      - APP_SCHEDULING_INTERVAL=${APP_SCHEDULING_INTERVAL}
+      - APP_DEBUG=${APP_DEBUG}
+    ports:
+      - '8091:8080'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=frontend"
+      - "traefik.http.routers.clientos2display-http.rule=Host(`${COMPOSE_SERVER_DOMAIN}`) && PathPrefix(`${COMPOSE_SCREEN_CLIENT_PATH}`)"
+      - "traefik.http.routers.clientos2display-http.entrypoints=web"
+      - "traefik.http.routers.clientos2display-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.clientos2display.rule=Host(`${COMPOSE_SERVER_DOMAIN}`) && PathPrefix(`${COMPOSE_SCREEN_CLIENT_PATH}`)"
+      - "traefik.http.routers.clientos2display.entrypoints=websecure"
+      # - "traefik.http.routers.clientos2display.middlewares=apios2display"
+      # - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=ITKBasicAuth@file"
+  admin:
+    image: os2display/os2display-admin-client:latest
+    networks:
+      - app
+      - frontend
+    environment:
+      - APP_ADMIN_CLIENT_PATH=${COMPOSE_ADMIN_CLIENT_PATH}
+      - API_PATH=${API_PATH}
+      - APP_TOUCH_BUTTON_REGIONS=${APP_TOUCH_BUTTON_REGIONS}
+    ports:
+      - '8092:8080'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=frontend"
+      - "traefik.http.routers.adminos2display-http.rule=Host(`${COMPOSE_SERVER_DOMAIN}`) && PathPrefix(`${COMPOSE_ADMIN_CLIENT_PATH}`)"
+      - "traefik.http.routers.adminos2display-http.entrypoints=web"
+      - "traefik.http.routers.adminos2display-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.adminos2display.rule=Host(`${COMPOSE_SERVER_DOMAIN}`) && PathPrefix(`${COMPOSE_ADMIN_CLIENT_PATH}`)"
+      - "traefik.http.routers.adminos2display.entrypoints=websecure"
+      # - "traefik.http.routers.adminos2display.middlewares=apios2display"
+      # - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=ITKBasicAuth@file"
+    volumes:
+      - ./media:/var/www/html/public/media:rw
+  api:
+    image: os2display/os2display-api-service:latest
+    networks:
+      - app
+    environment:
+      # PHP config values
+      - PHP_MAX_EXECUTION_TIME=${PHP_MAX_EXECUTION_TIME}
+      - PHP_MEMORY_LIMIT=${PHP_MEMORY_LIMIT}
+      - PHP_POST_MAX_SIZE=${PHP_POST_MAX_SIZE}
+      - PHP_UPLOAD_MAX_FILESIZE=${PHP_UPLOAD_MAX_FILESIZE}
+      - PHP_TIMEZONE=UTC
+      - PHP_PM_MAX_CHILDREN=16
+      - PHP_OPCACHE_VALIDATE_TIMESTAMPS=0
+      # APP (Symfony)
+      - APP_SECRET=${APP_SECRET:?err}
+      - APP_DATABASE_URL=${APP_DATABASE_URL:?err}
+      - APP_JWT_PASSPHRASE=${APP_JWT_PASSPHRASE:?err}
+      - APP_JWT_TOKEN_TTL=${APP_JWT_TOKEN_TTL}
+      - APP_JWT_SCREEN_TOKEN_TTL=${APP_JWT_SCREEN_TOKEN_TTL}
+      - APP_JWT_REFRESH_TOKEN_TTL=${APP_JWT_REFRESH_TOKEN_TTL}
+      - APP_JWT_SCREEN_REFRESH_TOKEN_TTL=${APP_JWT_SCREEN_REFRESH_TOKEN_TTL}
+      - APP_ENV=${APP_ENV}
+      - APP_TRUSTED_PROXIES=${APP_TRUSTED_PROXIES}
+      - APP_CORS_ALLOW_ORIGIN=${APP_CORS_ALLOW_ORIGIN}
+      - APP_DEFAULT_DATE_FORMAT=${APP_DEFAULT_DATE_FORMAT}
+      - APP_OIDC_METADATA_URL=${OIDC_METADATA_URL}
+      - APP_OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
+      - APP_OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - APP_OIDC_REDIRECT_URI=${OIDC_REDIRECT_URI}
+      - APP_OIDC_LEEWAY=${OIDC_LEEWAY}
+      - APP_REDIS_CACHE_PREFIX=${APP_REDIS_CACHE_PREFIX}
+      - APP_REDIS_CACHE_DSN=${APP_REDIS_CACHE_DSN}
+    volumes:
+      - ./jwt:/var/www/html/config/jwt:rw
+      - ./media:/var/www/html/public/media:rw
+  nginx-api:
+    image: os2display/os2display-api-service-nginx:latest
+    networks:
+      - app
+      - frontend
+    environment:
+      - PHP_FPM_SERVER=api
+      - NGINX_FPM_UPLOAD_MAX=${NGINX_FPM_UPLOAD_MAX}
+    depends_on:
+      - api
+    ports:
+      - "8093:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=frontend"
+      - "traefik.http.routers.apios2display-http.rule=Host(`${COMPOSE_SERVER_DOMAIN}`)"
+      - "traefik.http.routers.apios2display-http.entrypoints=web"
+      - "traefik.http.routers.apios2display-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.apios2display.rule=Host(`${COMPOSE_SERVER_DOMAIN}`)"
+      - "traefik.http.routers.apios2display.entrypoints=websecure"
+      # Redirect root / request to /${COMPOSE_ADMIN_CLIENT_PATH}
+      - "traefik.http.routers.apios2display.middlewares=redirect-to-admin"
+      - "traefik.http.middlewares.redirect-to-admin.redirectregex.regex=^https:\\/\\/([^\\/]+)\\/?$$"
+      - "traefik.http.middlewares.redirect-to-admin.redirectregex.replacement=https://$$1${COMPOSE_ADMIN_CLIENT_PATH}"
+      # - "traefik.http.routers.apios2display.middlewares=apios2display"
+      # - "traefik.http.middlewares.apios2display.ipwhitelist.sourcerange=212.10.60.163, 10.225.0.0/16"
+      # - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=ITKBasicAuth@file"
+    volumes:
+      - ./media:/var/www/html/public/media:rw
+  redis:
+    image: 'redis:6'
+    restart: unless-stopped
+    networks:
+      - app
+    ports:
+      - '6379'
+  mariadb:
+    image: 'mariadb:lts'
+    restart: unless-stopped
+    networks:
+      - app
+    environment:
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    ports:
+      - '3306'
