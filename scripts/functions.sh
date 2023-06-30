@@ -351,7 +351,7 @@ initiate () {
 	mkdir -p jwt media
 	# Start containers
 	printf "Starting containers...\n"
-	sudo docker compose up --force-recreate --detach --remove-orphans
+	sudo docker compose up -d
 
 	# Clean DSN
 	# shellcheck disable=SC2001
@@ -370,6 +370,8 @@ initiate () {
 	# Making sure this folder is available for the right user and group
 	sudo docker compose exec --user root api chown -R deploy. /var/www/html/config/jwt
 	sudo docker compose exec --user root api chown -R deploy. /var/www/html/media
+	sudo docker compose exec --user root api mkdir /var/www/html/public/media/
+	sudo docker compose exec --user root api chown -R deploy. /var/www/html/public/media/
 
 	# Moving old keypair so we can generate new ones
 	# This is necessary, because old key pairs interferes with login, and results in JWT errors (500 Server Error)
