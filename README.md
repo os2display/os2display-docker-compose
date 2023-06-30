@@ -1,5 +1,20 @@
 # OS2Display
 
+## Links to repositories and Docker images
+
+OS2 docker images used in this project:
+
+- [os2display-admin-client](https://hub.docker.com/r/os2display/os2display-admin-client)
+- [os2display-client](https://hub.docker.com/r/os2display/os2display-client)
+- [os2display-api-service-nginx](https://hub.docker.com/r/os2display/os2display-api-service-nginx)
+- [os2display/os2display-api-service](https://hub.docker.com/r/os2display/os2display-api-service)
+
+OS2 github repositories used in this project:
+
+- [display-admin-client](https://github.com/os2display/display-admin-client)
+- [display-client](https://github.com/os2display/display-client)
+- [display-api-service](https://github.com/os2display/display-api-service)
+
 ## How to install OS2Display
 
 ### Custom .env file - "Automatic install"
