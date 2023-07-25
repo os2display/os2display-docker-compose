@@ -370,6 +370,7 @@ initiate () {
 
 	# Making sure this folder is available for the right user and group
 	sudo docker compose exec --user root api chown -R deploy. /var/www/html/config/jwt
+	sudo docker compose exec --user root api mkdir /var/www/html/media
 	sudo docker compose exec --user root api chown -R deploy. /var/www/html/media
 	sudo docker compose exec --user root api mkdir /var/www/html/public/media/
 	sudo docker compose exec --user root api chown -R deploy. /var/www/html/public/media/
@@ -385,10 +386,10 @@ initiate () {
 	# Migrate database and import templates and screen layouts
 	migrate_and_import
 
-	docker compose exec client mkdir -p /var/www/html/client/
-	docker compose exec client ln -s /var/www/html/static /var/www/html/client/
-	docker compose exec client ln -s /var/www/html/config.json /var/www/html/client/
-	docker compose exec client ln -s /var/www/html/release.json /var/www/html/client/
+	sudo docker compose exec client mkdir -p /var/www/html/client/
+	sudo docker compose exec client ln -s /var/www/html/static /var/www/html/client/
+	sudo docker compose exec client ln -s /var/www/html/config.json /var/www/html/client/
+	sudo docker compose exec client ln -s /var/www/html/release.json /var/www/html/client/
 
 	# Ask if we want to create a tenant and administrator now or later?
 	read -rep $'Do you want to create a tenant and administrator now? (Y/N):' continue
