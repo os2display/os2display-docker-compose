@@ -161,7 +161,6 @@ sudo_create_admin () {
 ## Checks whether or not the current user is in the docker group or not
 #---
 check_docker_group () {
-
 	echo "Checking if user is in docker group".
 	echo "If you have just added your user in the docker group in the currently running session,"
 	echo "you may want to refresh your session, e.g. by logging out and logging in again."
@@ -177,6 +176,18 @@ check_docker_group () {
 		sudo usermod -aG docker $(echo $USER)
 		exit 5
 	fi
+}
+
+#---
+## Check git branch
+#---
+check_git_branch () {
+	echo "##### GIT INFORMATION #####"
+	REMOTE=$(git remote get-url origin)
+	BRANCH=$(git rev-parse --abbrev-ref HEAD)
+	printf 'GIT BRANCH: %s\n' "$BRANCH"
+	printf 'GIT REMOTE: %s\n' "$REMOTE"
+	echo "###########################"
 }
 
 #---
