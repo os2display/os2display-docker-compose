@@ -328,9 +328,6 @@ install_dependencies () {
 					sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker docker-compose-plugin -y -q
 					sudo systemctl enable docker containerd
 
-					# Check if the logged in user is in the docker group, and add them if they aren't.
-					check_docker_group
-
 				elif [[ "$DEP" = "certbot" ]]; then
 					sudo python3 -m venv /opt/certbot/
 					sudo /opt/certbot/bin/pip install --upgrade pip

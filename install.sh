@@ -6,6 +6,9 @@ source scripts/functions.sh
 ENV_FILE="./.env"
 DB_TEST_COUNT=15
 
+# Check if user is in docker group
+check_docker_group
+
 # Install all the dependencies, if missing.
 install_dependencies
 
