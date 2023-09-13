@@ -6,6 +6,13 @@ source scripts/functions.sh
 ENV_FILE="./.env"
 DB_TEST_COUNT=15
 
+# Inform git information
+check_git_branch
+sleep 2 # Sleep for people to be able to read above information.
+
+# Check if user is in docker group
+check_docker_group
+
 # Install all the dependencies, if missing.
 install_dependencies
 

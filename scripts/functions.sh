@@ -110,7 +110,7 @@ migrate_and_import () {
 	sudo docker compose exec --user deploy api bin/console app:template:load https://raw.githubusercontent.com/os2display/display-templates/main/build/travel-config-main.json
 	sudo docker compose exec --user deploy api bin/console app:template:load https://raw.githubusercontent.com/os2display/display-templates/main/build/video-config-main.json
 
-	# Import screen layoyts
+	# Import screen layouts
 	printf "Importing screen layouts\n"
 	sudo docker compose exec --user deploy api bin/console app:screen-layouts:load --update --cleanup-regions https://raw.githubusercontent.com/os2display/display-templates/main/src/screen-layouts/full-screen.json
 	sudo docker compose exec --user deploy api bin/console app:screen-layouts:load --update --cleanup-regions https://raw.githubusercontent.com/os2display/display-templates/main/src/screen-layouts/three-boxes-horizontal.json
@@ -155,6 +155,39 @@ create_admin () {
 #---
 sudo_create_admin () {
 	sudo docker compose exec api php bin/console app:user:add --admin "$@"
+}
+
+#---
+## Checks whether or not the current user is in the docker group or not
+#---
+check_docker_group () {
+	echo "Checking if user is in docker group".
+	echo "If you have just added your user in the docker group in the currently running session,"
+	echo "you may want to refresh your session, e.g. by logging out and logging in again."
+
+	# Get the output of the groups command and check if "docker" appears in the groups
+	DOCKER_GROUP=$(groups | sed 's/ /\n/g' | grep "docker")
+
+	if [[ -z "$DOCKER_GROUP" ]]; then
+		>&2 echo "Your user is not in the docker group!"
+		>&2 echo "Adding you to the docker group, but you have to refresh your shell, e.g. by logging out and logging in again."
+		>&2 echo "Once you have refreshed your shell, just rerun the install script."
+		>&2 echo "You have been added to the docker group, and the script is exiting for you to refresh your shell."
+		sudo usermod -aG docker $(echo $USER)
+		exit 5
+	fi
+}
+
+#---
+## Check git branch
+#---
+check_git_branch () {
+	echo "##### GIT INFORMATION #####"
+	REMOTE=$(git remote get-url origin)
+	BRANCH=$(git rev-parse --abbrev-ref HEAD)
+	printf 'GIT BRANCH: %s\n' "$BRANCH"
+	printf 'GIT REMOTE: %s\n' "$REMOTE"
+	echo "###########################"
 }
 
 #---
@@ -306,8 +339,6 @@ install_dependencies () {
 					sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker docker-compose-plugin -y -q
 					sudo systemctl enable docker containerd
 
-					sudo usermod -aG docker $(echo $USER)
-
 				elif [[ "$DEP" = "certbot" ]]; then
 					sudo python3 -m venv /opt/certbot/
 					sudo /opt/certbot/bin/pip install --upgrade pip
@@ -370,6 +401,7 @@ initiate () {
 
 	# Making sure this folder is available for the right user and group
 	sudo docker compose exec --user root api chown -R deploy. /var/www/html/config/jwt
+	sudo docker compose exec --user root api mkdir /var/www/html/media
 	sudo docker compose exec --user root api chown -R deploy. /var/www/html/media
 	sudo docker compose exec --user root api mkdir /var/www/html/public/media/
 	sudo docker compose exec --user root api chown -R deploy. /var/www/html/public/media/
@@ -385,10 +417,10 @@ initiate () {
 	# Migrate database and import templates and screen layouts
 	migrate_and_import
 
-	docker compose exec client mkdir -p /var/www/html/client/
-	docker compose exec client ln -s /var/www/html/static /var/www/html/client/
-	docker compose exec client ln -s /var/www/html/config.json /var/www/html/client/
-	docker compose exec client ln -s /var/www/html/release.json /var/www/html/client/
+	sudo docker compose exec client mkdir -p /var/www/html/client/
+	sudo docker compose exec client ln -s /var/www/html/static /var/www/html/client/
+	sudo docker compose exec client ln -s /var/www/html/config.json /var/www/html/client/
+	sudo docker compose exec client ln -s /var/www/html/release.json /var/www/html/client/
 
 	# Ask if we want to create a tenant and administrator now or later?
 	read -rep $'Do you want to create a tenant and administrator now? (Y/N):' continue
