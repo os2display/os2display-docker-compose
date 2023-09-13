@@ -158,6 +158,23 @@ sudo_create_admin () {
 }
 
 #---
+## Checks whether or not the current user is in the docker group or not
+#---
+check_docker_group () {
+	# Get the output of the groups command and check if "docker" appears in the groups
+	DOCKER_GROUP=$(groups | sed 's/ /\n/g' | grep "docker")
+
+	if [[ -z "$DOCKER_GROUP" ]]; then
+		>&2 echo "Your user is not in the docker group!"
+		>&2 echo "Adding you to the docker group, but you have to refresh your shell, e.g. by logging out and logging in again."
+		>&2 echo "Once you have refreshed your shell, just rerun the install script."
+		>&2 echo "You have been added to the docker group, and the script is exiting for you to refresh your shell."
+		sudo usermod -aG docker $(echo $USER)
+		exit 5
+	fi
+}
+
+#---
 ## Restarts all or specified containers
 #---
 restart () {
@@ -306,7 +323,8 @@ install_dependencies () {
 					sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker docker-compose-plugin -y -q
 					sudo systemctl enable docker containerd
 
-					sudo usermod -aG docker $(echo $USER)
+					# Check if the logged in user is in the docker group, and add them if they aren't.
+					check_docker_group
 
 				elif [[ "$DEP" = "certbot" ]]; then
 					sudo python3 -m venv /opt/certbot/
