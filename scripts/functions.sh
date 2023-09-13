@@ -110,7 +110,7 @@ migrate_and_import () {
 	sudo docker compose exec --user deploy api bin/console app:template:load https://raw.githubusercontent.com/os2display/display-templates/main/build/travel-config-main.json
 	sudo docker compose exec --user deploy api bin/console app:template:load https://raw.githubusercontent.com/os2display/display-templates/main/build/video-config-main.json
 
-	# Import screen layoyts
+	# Import screen layouts
 	printf "Importing screen layouts\n"
 	sudo docker compose exec --user deploy api bin/console app:screen-layouts:load --update --cleanup-regions https://raw.githubusercontent.com/os2display/display-templates/main/src/screen-layouts/full-screen.json
 	sudo docker compose exec --user deploy api bin/console app:screen-layouts:load --update --cleanup-regions https://raw.githubusercontent.com/os2display/display-templates/main/src/screen-layouts/three-boxes-horizontal.json
