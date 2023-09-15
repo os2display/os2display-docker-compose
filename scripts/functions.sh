@@ -173,6 +173,7 @@ check_docker_group () {
 		>&2 echo "Adding you to the docker group, but you have to refresh your shell, e.g. by logging out and logging in again."
 		>&2 echo "Once you have refreshed your shell, just rerun the install script."
 		>&2 echo "You have been added to the docker group, and the script is exiting for you to refresh your shell."
+		[ $(sudo getent group docker) ] || sudo groupadd docker
 		sudo usermod -aG docker $(echo $USER)
 		exit 5
 	fi
