@@ -32,6 +32,7 @@ services:
       - "traefik.http.routers.clientos2display.entrypoints=websecure"
       # - "traefik.http.routers.clientos2display.middlewares=apios2display"
       # - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=ITKBasicAuth@file"
+    restart: always
   admin:
     image: os2display/os2display-admin-client:latest
     networks:
@@ -56,6 +57,7 @@ services:
       # - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=ITKBasicAuth@file"
     volumes:
       - ./media:/var/www/html/public/media:rw
+    restart: always
   api:
     image: os2display/os2display-api-service:latest
     networks:
@@ -91,6 +93,7 @@ services:
     volumes:
       - ./jwt:/var/www/html/config/jwt:rw
       - ./media:/var/www/html/public/media:rw
+    restart: always
   nginx-api:
     image: os2display/os2display-api-service-nginx:latest
     networks:
@@ -121,6 +124,7 @@ services:
       # - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=ITKBasicAuth@file"
     volumes:
       - ./media:/var/www/html/public/media:rw
+    restart: always
   redis:
     image: 'redis:6'
     restart: unless-stopped
@@ -128,6 +132,7 @@ services:
       - app
     ports:
       - '6379'
+    restart: always
   mariadb:
     image: 'mariadb:lts'
     restart: unless-stopped
