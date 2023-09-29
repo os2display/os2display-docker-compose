@@ -396,8 +396,8 @@ sudo cp nginx.conf.example $NGINX_CONF_FILE
 printf "Updating os2display-nginx.conf\n"
   
 sudo sed -i "/server_name /c\  server_name $DOMAIN" $NGINX_CONF_FILE
-sudo sed -i "/ssl_certificate /c\  ssl_certificate /etc/ssl/$DOMAIN.pem" $NGINX_CONF_FILE
-sudo sed -i "/ssl_certificate_key /c\  ssl_certificate_key /etc/ssl/$DOMAIN-key.pem" $NGINX_CONF_FILE
+sudo sed -i "/ssl_certificate /c\  ssl_certificate /etc/ssl/$DOMAIN.pem;" $NGINX_CONF_FILE
+sudo sed -i "/ssl_certificate_key /c\  ssl_certificate_key /etc/ssl/$DOMAIN-key.pem;" $NGINX_CONF_FILE
 
 
 # Enable site
