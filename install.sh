@@ -96,4 +96,10 @@ else
 	initiate "$DSN" "$DB_TEST_COUNT"
 
 	printf "And now you're done!\n"
+
+  if [[ "$TEST_CONFIG" -eq 1 ]]; then
+    printf "Admin site URL:  https://$DOMAIN/admin\n"
+    printf "Screen client URL:  https://$DOMAIN/client\n"
+    printf "Open a browser on this PC and check it out!\n"
+  fi
 fi
