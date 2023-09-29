@@ -27,17 +27,17 @@ if test -f "$ENV_FILE"; then
 else
 	printf "%s does not exist. Installing interactively.\n" "$ENV_FILE"
 
-  printf "Enter a DNS-registred domain name. You must have a valid SSL-certificate for the domain.\n";
+  printf "\nEnter a DNS-registred domain name. You must have a valid SSL-certificate for the domain.\n";
 
   read -rep $'(Leave blank, if you don\'t have any, because you are doing a test install)\nDomain Name: ' DOMAIN
 
   if [ -z "$DOMAIN" ]; then
-    printf "\nDu you want the installer to help you do a test environment setup. \
+    printf "\nLet the installer do a test environment setup? \
     \nIt will setup a fake domain name, configure the NGINX proxy and generate a locally valid SSL-certificate.
     (This part of the installer has only been tested on Ubuntu Desktop 22.04)";
   fi
 
-  read -rep $'\n[1]: Yes, configure environment\n[2]: No, I will configure environment manually.\n' TEST_CONFIG
+  read -rep $'\n[1]: Yes, do test environment setup\n[2]: No, I will configure environment manually.\n' TEST_CONFIG
   if [[ "$TEST_CONFIG" -ne 1 && "$TEST_CONFIG" -ne 2 ]]; then
     printf "You have to choose either 1 or 2!";
   fi
