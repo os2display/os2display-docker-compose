@@ -33,7 +33,8 @@ else
 
   if [ -z "$DOMAIN" ]; then
     printf "\nDu you want the installer to help you do a test environment setup. \
-    \nIt will setup a fake domain name, configure the NGINX proxy and generate a locally valid SSL-certificate.";
+    \nIt will setup a fake domain name, configure the NGINX proxy and generate a locally valid SSL-certificate.
+    (This part of the installer has only been tested on Ubuntu Desktop 22.04)";
   fi
 
   read -rep $'\n[1]: Yes, configure environment\n[2]: No, I will configure environment manually.\n' TEST_CONFIG
