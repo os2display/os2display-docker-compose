@@ -27,7 +27,25 @@ if test -f "$ENV_FILE"; then
 else
 	printf "%s does not exist. Installing interactively.\n" "$ENV_FILE"
 
-	read -rep $'What domain are you going to use?: ' DOMAIN
+  printf "Enter a DNS-registred domain name. You must have a valid SSL-certificate for the domain.\n";
+
+  read -rep $'(Leave blank, if you don\'t have any, because you are doing a test install)\nDomain Name: ' DOMAIN
+
+  if [ -z "$DOMAIN" ]; then
+    printf "\nDu you want the installer to help you do a test environment setup. \
+    \nIt will setup a fake domain name, configure the NGINX proxy and generate a locally valid SSL-certificate.";
+  fi
+
+  read -rep $'\n[1]: Yes, configure environment\n[2]: No, I will configure environment manually.\n' TEST_CONFIG
+  if [[ "$TEST_CONFIG" -ne 1 && "$TEST_CONFIG" -ne 2 ]]; then
+    printf "You have to choose either 1 or 2!";
+  fi
+
+  # Do test environment setup
+  if [[ "$TEST_CONFIG" -eq 1 ]]; then
+    DOMAIN="www.displaytest.dk";
+    setup_test_environment  
+  fi
 
 	read -rep $'[1]: If you already have a MariaDB server\n[2]: If you want to use the included MariaDB image\n' MARIADB
 	if [[ "$MARIADB" -ne 1 && "$MARIADB" -ne 2 ]]; then
