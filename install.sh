@@ -98,14 +98,15 @@ else
 	printf "And now you're done!\n"
 
   if [[ "$TEST_CONFIG" -eq 1 ]]; then
-    printf "Access OS2Display Admin and Screen client on these URL's.\n"
     printf "Open a browser on this PC and check it out!\n"
+    printf "Access OS2Display Admin and Screen client on these URL's.\n"
   else
     printf "OS2Display is now installed.\n"
     printf "Now you need to configure NGINX and provide a SSL certificate\n"
     printf "When done you can access OS2Display Admin and Screen client on these URL's.\n"
   fi
-
-  printf "\nAdmin site URL:  https://$DOMAIN/admin\n"
+  printf "#########################################\n"
+  printf "Admin site URL:  https://$DOMAIN/admin\n"
   printf "Screen client URL:  https://$DOMAIN/client\n"
+  printf "#########################################\n"
 fi
