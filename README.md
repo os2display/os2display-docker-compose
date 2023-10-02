@@ -1,44 +1,97 @@
 # OS2Display
 
-## Links to repositories and Docker images
-
-OS2 docker images used in this project:
-
-- [os2display-admin-client](https://hub.docker.com/r/os2display/os2display-admin-client)
-- [os2display-client](https://hub.docker.com/r/os2display/os2display-client)
-- [os2display-api-service-nginx](https://hub.docker.com/r/os2display/os2display-api-service-nginx)
-- [os2display/os2display-api-service](https://hub.docker.com/r/os2display/os2display-api-service)
-
-OS2 github repositories used in this project:
-
-- [display-admin-client](https://github.com/os2display/display-admin-client)
-- [display-client](https://github.com/os2display/display-client)
-- [display-api-service](https://github.com/os2display/display-api-service)
-
 ## How to install OS2Display
+This is the installation package for OS2Display v2. It works on Debian-based systems and has been tested on Ubuntu Desktop 22.04 and Ubuntu Server 22.04.
 
-### Custom .env file - "Automatic install"
-You can choose to copy `.env.example` to `.env`, adjust the settings to your liking, and run the installation script:
+You can [download the installation-package here](https://github.com/os2display/os2display-docker-compose/archive/refs/heads/main.zip) or just clone the Git-repo.
+
+The installation package is suitable for server install or for installation on local PC for test or demo purposes.
+
+### Running the installation script ###
+Before running the installation script you can choose to copy `.env.example` to `.env`, adjust the settings to your liking and then run the installation script. 
+
+Alternatively, you can run the installation script without a .env file, and let the **interactive installer** create one for you
 
 ```bash
 ./install.sh
 ```
 
-It will ask for sudo, as it will try to install dependencies.
-
-In the end it will ask if you want to create manually created tenants and administrator users.
+It will ask for sudo, as it will try to install dependencies. During install you may be asked to refresh your shell. Do the refresh and then re-run `./install.sh`. 
 
 ### Interactive install
 
-Alternatively, you can just run the installation script without a .env file, and it will create one for you:
+If you choose to run the installation script without a .env file, the interactive installer will ask you some questions and then create then .env file for you.
 
+The installer will ask you for a DNS-registred **domain name**. If you are only doing a test-install for local use and you don't have a domain name yet, you can just leave it blank. 
+
+If **domain name** is left blank you can choose to have the installer configure the test-domain `www.displaytest.dk` for you. It will setup the NGIN-proxy and create a locally trusted SSL-certificate.
+
+The installer will also ask if you have a **MariaDB server** or you wan't the installer to create a MariaDB container for you.
+
+Then the script asks you if you want to **create a tenant and an administrator**. A tenant is XXX 
+For the tenant you need to provide:
+ - Tenant Key
+ - Tenant Title
+ - Tenant Description
+
+If you let the script create an administrator user you must provide:
+ - Administrator E-mail
+ - Administrator Password
+ - Administrator Full Name 
+
+ ### How to do a local demo-installation on a single PC
+ To evaluate if OSDisplay can meet the needs of your organization, you can make a local demo-installation on a standard PC. 
+ 
+ This is how you do:
+ 1. Find a PC and install Ubuntu Desktop 22.04. Choose default settings when running the Ubuntu-installer.
+ 2. Log in to th computer and start a terminal.
+ 3. Install Git: `sudo apt install git`
+ 4. Clone this repo to your computer: `git clone https://github.com/os2display/os2display-docker-compose.git`
+ 5. Enter the folder: `cd os2display-docker-compose`
+ 6. Run the installer: `./install.sh` and follow the instructions
+
+#### NGINX quick guide
+
+If you have installed OS2Display via the installation script, NGINX should be installed via apt.
+
+To help you on your way, an example NGINX conf is provided in the file ´example.nginx.conf´.
+
+Create a config-file in `/etc/nginx/sites-available`. You can name it as you like, but it needs to end with .conf. E. g. `displaytest.conf`. Copy the example config and put it in the file. 
+
+Be sure to change the value of `server_name` to your domain name. Also ensure that the path to your certificate file and certificate key is correct and valid. 
+
+Now symlink the conf-file into sites-enabled:
 ```bash
-./install.sh
+sudo ln -s /etc/nginx/sites-available/displaytest.conf /etc/nginx/sites-enabled/displaytest.conf
 ```
 
-If you don't want to use the included MariaDB service, you can shut it down and comment it out in `docker-compose.yml`
+You can run this command to check your config-file for syntax errors:
+```bash
+sudo nginx -t
+```
 
-In the end it will ask if you want to create manually created tenants and administrator users.
+When the config-file validates, then restart NGINX to load the new config:
+```bash
+sudo systemctl restart nginx
+```
+
+NGINX is preferred as a reverse proxy. If you know your way around docker compose, you can add nginx in `docker-compose.yml`.
+
+ ### SSL/TLS Certificate for production server
+
+You can choose to install your own certificate, or you can use Let's encrypt. If you have installed OS2Display via the installation script, certbot should be installed.
+
+To install a certificate with certbot, you can run this command:
+```bash
+certbot -d <insert domain here>
+```
+
+Certbot will do its best to automatically renew the certificate before it expires, but if the certificate manages to expire anyway for whatever reason, you can manually renew the certificate like so:
+```bash
+certbot renew
+```
+
+If you have more than one certificate managed by certbot, it will also renew those if they need to be renewed.
 
 ### OpenID Connect
 
@@ -56,84 +109,6 @@ OIDC_LEEWAY=30
 
 APP_CLI_REDIRECT=ADMIN_CLI_REDIRECT_URI
 ###< itk-dev/openid-connect-bundle ###
-```
-
-### NGINX setup
-
-NGINX is preferred as a reverse proxy. If you know your way around docker compose, you can add nginx in `docker-compose.yml`.
-
-If you have installed OS2Display via the installation script, NGINX should be installed via apt.
-
-To help you on your way, here is an example of a very basic NGINX conf:
-
-```nginx
-upstream api {
-  server 127.0.0.1:8093;
-}
-
-upstream admin {
-  server 127.0.0.1:8092;
-}
-
-upstream client {
-  server 127.0.0.1:8091;
-}
-
-server {
-  listen 80;
-  server_name display.bellcom.dk;
-
-  location / {
-    proxy_pass http://client/;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-  }
-
-  location /admin {
-    proxy_pass http://admin/;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-  }
-
-  location /v1 {
-    proxy_pass http://api/v1;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-  }
-
-  location /media {
-    proxy_pass http://api/media;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-  }
-}
-```
-
-### SSL/TLS Certificate
-
-You can choose to install your own certificate, or you can use Let's encrypt.
-
-If you have installed OS2Display via the installation script, certbot should be installed.
-
-To install a certificate with certbot, you can run this command:
-```bash
-certbot -d <insert domain here>
-```
-
-Certbot will do its best to automatically renew the certificate before it expires, but if the certificate manages to expire anyway for whatever reason, you can manually renew the certificate like so:
-```bash
-certbot renew
-```
-
-If you have more than one certificate managed by certbot, it will also renew those if they need to be renewed.
 
 ### Good to know
 
@@ -338,6 +313,21 @@ Again, creating a playlist is much the same as the previous two.
 - Scroll down to "Spillelister tilknyttet regionen"
 - Select your playlist
 - Save
+
+## Links to repositories and Docker images
+
+OS2 docker images used in this project:
+
+- [os2display-admin-client](https://hub.docker.com/r/os2display/os2display-admin-client)
+- [os2display-client](https://hub.docker.com/r/os2display/os2display-client)
+- [os2display-api-service-nginx](https://hub.docker.com/r/os2display/os2display-api-service-nginx)
+- [os2display/os2display-api-service](https://hub.docker.com/r/os2display/os2display-api-service)
+
+OS2 github repositories used in this project:
+
+- [display-admin-client](https://github.com/os2display/display-admin-client)
+- [display-client](https://github.com/os2display/display-client)
+- [display-api-service](https://github.com/os2display/display-api-service)
 
 ## Other sources
 
