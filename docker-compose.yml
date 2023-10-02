@@ -132,7 +132,6 @@ services:
       - app
     ports:
       - '6379'
-    restart: always
   mariadb:
     image: 'mariadb:lts'
     restart: unless-stopped
