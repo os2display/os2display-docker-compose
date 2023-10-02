@@ -48,7 +48,7 @@ else
     setup_test_environment  
   fi
 
-	read -rep $'[1]: If you already have a MariaDB server\n[2]: If you want to use the included MariaDB image\n' MARIADB
+	read -rep $'\n[1]: If you already have a MariaDB server\n[2]: If you want to use the included MariaDB image\n' MARIADB
 	if [[ "$MARIADB" -ne 1 && "$MARIADB" -ne 2 ]]; then
 		printf "You have to choose either 1 or 2!";
 	fi
@@ -98,8 +98,14 @@ else
 	printf "And now you're done!\n"
 
   if [[ "$TEST_CONFIG" -eq 1 ]]; then
-    printf "Admin site URL:  https://$DOMAIN/admin\n"
-    printf "Screen client URL:  https://$DOMAIN/client\n"
+    printf "Access OS2Display Admin and Screen client on these URL's.\n"
     printf "Open a browser on this PC and check it out!\n"
+  else
+    printf "OS2Display is now installed.\n"
+    printf "Now you need to configure NGINX and provide a SSL certificate\n"
+    printf "When done you can access OS2Display Admin and Screen client on these URL's.\n"
   fi
+
+  printf "\nAdmin site URL:  https://$DOMAIN/admin\n"
+  printf "Screen client URL:  https://$DOMAIN/client\n"
 fi
