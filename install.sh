@@ -34,8 +34,8 @@ else
   # If domain was left empty, ask if they want a test environment setup done?
   if [ -z "$DOMAIN" ]; then
     printf "\nThe installer can do a test environment setup. \
-    \nIt will setup a domain name for testing, configure the NGINX proxy and generate a locally valid SSL-certificate.
-    (This part of the installer has only been tested on Ubuntu Desktop 22.04)";
+    \nIt will setup a domain name for testing, configure the NGINX proxy and generate a locally valid SSL-certificate.\
+    \n(This part of the installer has only been tested on Ubuntu Desktop 22.04)\n";
  
 	  read -rep $'Do a test environment setup? (Y/N):' continue
     # If yes, do test environment setup
@@ -44,7 +44,7 @@ else
       setup_test_environment  
     fi
   fi
-If you want to use the included MariaDB image
+
 	read -rep $'\n[1]: If you want to use the included MariaDB image\n[2]: If you already have a MariaDB server\n' MARIADB
 	if [[ "$MARIADB" -ne 1 && "$MARIADB" -ne 2 ]]; then
 		printf "You have to choose either 1 or 2!";
@@ -98,7 +98,7 @@ If you want to use the included MariaDB image
     printf "Open a browser on this PC and check it out!\n"
     printf "Access OS2Display Admin and Screen client on these URL's.\n"
   else
-    printf "OS2Display is now installed.\n"
+    printf "\nOS2Display is now installed.\n"
     printf "Now you need to configure NGINX and provide a SSL certificate\n"
     printf "When done you can access OS2Display Admin and Screen client on these URL's.\n"
   fi
