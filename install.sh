@@ -37,9 +37,9 @@ else
     \nIt will setup a domain name for testing, configure the NGINX proxy and generate a locally valid SSL-certificate.\
     \n(This part of the installer has only been tested on Ubuntu Desktop 22.04)\n";
  
-	  read -rep $'Do a test environment setup? (Y/N):' continue
+	  read -rep $'Do a test environment setup? (Y/N):' testsetup
     # If yes, do test environment setup
-	  if [[ $continue == [yY] || $continue == [yY][eE][sS] ]]; then
+	  if [[ $testsetup == [yY] || $testsetup == [yY][eE][sS] ]]; then
       DOMAIN="www.displaytest.dk";
       setup_test_environment  
     fi
@@ -94,7 +94,7 @@ else
 
 	printf "And now you're done!\n"
 
-  if [[ "$TEST_CONFIG" -eq 1 ]]; then
+  if [[ $testsetup == [yY] || $testsetup == [yY][eE][sS] ]]; then
     printf "Open a browser on this PC and check it out!\n"
     printf "Access OS2Display Admin and Screen client on these URL's.\n"
   else
