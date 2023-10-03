@@ -44,14 +44,14 @@ else
       setup_test_environment  
     fi
   fi
-
-	read -rep $'\n[1]: If you already have a MariaDB server\n[2]: If you want to use the included MariaDB image\n' MARIADB
+If you want to use the included MariaDB image
+	read -rep $'\n[1]: If you want to use the included MariaDB image\n[2]: If you already have a MariaDB server\n' MARIADB
 	if [[ "$MARIADB" -ne 1 && "$MARIADB" -ne 2 ]]; then
 		printf "You have to choose either 1 or 2!";
 	fi
 
 	# Create necessary variables for database connection
-	if [[ "$MARIADB" -eq 1 ]]; then
+	if [[ "$MARIADB" -eq 2 ]]; then
 		read -rep $'Database Username: ' DB_USER
 		read -rep $'Database Password: ' DB_PASS
 		read -rep $'Database Name: ' DB_NAME
@@ -59,7 +59,7 @@ else
 		read -rep $'Database Port: ' DB_PORT
 		read -rep $'MariaDB Version: ' DB_VERSION
 		DSN="mysql:\/\/$DB_USER:$DB_PASS@$DB_HOST:$DB_PORT\/$DB_NAME?serverVersion=mariadb-$DB_VERSION"
-	elif [[ "$MARIADB" -eq 2 ]]; then
+	elif [[ "$MARIADB" -eq 1 ]]; then
 		DSN=$(autogenerate_dsn)
 		# shellcheck disable=SC2034
 		CLEAN_DSN=$(echo "$DSN" | sed 's/\\//g')
