@@ -40,17 +40,15 @@ If you let the script create an administrator user you must provide:
  - Administrator Full Name 
 
  ### How to do a local demo-installation on a single PC
- To evaluate if OSDisplay can meet the needs of your organization, you can make a local demo-installation on a standard PC. 
+ To evaluate if OSDisplay can meet the needs of your organization, you can make a local demo-installation on a standard PC.
  
  This is how you do:
  1. Find a PC and install Ubuntu Desktop 22.04. Choose default settings when running the Ubuntu-installer.
- 2. Log in to th computer and start a terminal.
- 3. Install Git: `sudo apt install git`
- 4. Clone this repo to your computer: `git clone https://github.com/os2display/os2display-docker-compose.git`
- 5. Enter the folder: `cd os2display-docker-compose`
- 6. Run the installer: `./install.sh` and follow the instructions
+ 2. [Download the installation package](https://github.com/os2display/os2display-docker-compose/archive/refs/heads/main.zip) and unzip to your home directory. (Alternatively you can git clone this project.)
+ 3. Enter the directory: `cd os2display-docker-compose-main`
+ 4. Run the installer: `./install.sh` and follow the instructions.
 
-#### NGINX quick guide
+### NGINX quick guide
 
 If you have installed OS2Display via the installation script, NGINX should be installed via apt.
 
@@ -109,7 +107,7 @@ OIDC_LEEWAY=30
 
 APP_CLI_REDIRECT=ADMIN_CLI_REDIRECT_URI
 ###< itk-dev/openid-connect-bundle ###
-
+```
 ### Good to know
 
 #### Dependencies
