@@ -95,7 +95,7 @@ services:
       - ./media:/var/www/html/public/media:rw
     restart: always
   nginx-api:
-       image: os2display/display-api-service-nginx:latest
+    image: os2display/display-api-service-nginx:latest
     networks:
       - app
       - frontend
