@@ -7,7 +7,7 @@ networks:
 
 services:
   client:
-    image: os2display/os2display-client:latest
+    image: os2display/display-client:latest
     networks:
       - app
       - frontend
@@ -34,7 +34,7 @@ services:
       # - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=ITKBasicAuth@file"
     restart: always
   admin:
-    image: os2display/os2display-admin-client:latest
+    image: os2display/display-admin-client:latest
     networks:
       - app
       - frontend
@@ -59,7 +59,7 @@ services:
       - ./media:/var/www/html/public/media:rw
     restart: always
   api:
-    image: os2display/os2display-api-service:latest
+    image: os2display/display-api-service:develop
     networks:
       - app
     environment:
@@ -95,7 +95,7 @@ services:
       - ./media:/var/www/html/public/media:rw
     restart: always
   nginx-api:
-    image: os2display/os2display-api-service-nginx:latest
+       image: os2display/display-api-service-nginx:latest
     networks:
       - app
       - frontend
