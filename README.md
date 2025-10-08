@@ -1,3 +1,11 @@
+> [!Important]
+> ### This project is no longer actively maintained.
+> The source code in this repository is no longer maintained. It has been superseded by [os2display/os2display-docker-server](https://github.com/os2display/os2display-docker-server), which offers improved features and better support.
+> 
+> Thank you to all who have contributed to this project. We recommend transitioning to [os2display/os2display-docker-server](https://github.com/os2display/os2display-docker-server) for continued support and updates.
+> 
+<br>
+
 # OS2Display
 
 ## How to install OS2Display
